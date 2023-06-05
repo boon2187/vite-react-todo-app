@@ -14,6 +14,7 @@ export const TodoForm = ({ addTodo }: TodoFormProps) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // formの内容(value)を追加してformの内容を空にする
+    if (!value) return;
     addTodo(value);
     setValue("");
   };
