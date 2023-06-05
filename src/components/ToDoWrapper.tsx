@@ -46,7 +46,7 @@ export const ToDoWrapper = () => {
   // 開始する関数なので、isEditingを反転させるだけ
   // todoコンポーネントに渡す
   const editTodo = (id: string) => {
-    // console.log(id);
+    // ボタンを押したtodoのidと一致するtodoのisEditingを反転させる
     setTodos(
       todos.map((todo) =>
         todo.id === id ? { ...todo, isEditing: !todo.isEditing } : todo
@@ -61,6 +61,7 @@ export const ToDoWrapper = () => {
   const editTask = (id: string, newTask: string) => {
     setTodos(
       todos.map((todo) =>
+        // 編集するidと一致するtodoのtaskを新しいtaskに更新する
         todo.id === id
           ? { ...todo, task: newTask, isEditing: !todo.isEditing }
           : todo
