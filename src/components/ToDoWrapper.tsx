@@ -56,6 +56,7 @@ export const ToDoWrapper = () => {
 
   // todoを実際に更新する関数
   // 編集開始されたtodoのidと、新しいtodoを受け取ってtodoの中身を更新する
+  // isEditingを反転させて戻す
   // editTodoFormコンポーネントに渡す
   const editTask = (id: string, newTask: string) => {
     setTodos(
