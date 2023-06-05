@@ -6,7 +6,7 @@ import { EditTodoForm } from "./EditTodoForm";
 uuidv4();
 
 // todoの型を定義
-export type Todotype = {
+type Todotype = {
   id: string;
   task: string;
   completed: boolean;
