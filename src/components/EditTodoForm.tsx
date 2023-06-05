@@ -8,10 +8,13 @@ type EditTodoFormProps = {
 };
 
 export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
+  // formの内容を保持するstate
   const [value, setValue] = useState<string>(task);
 
+  // formのsubmit時の処理
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    // idがidのtodoに対して、formの内容(value)でtaskの内容を更新してformの内容を空にする
     editTask(id, value);
     setValue("");
     // console.log(value);
