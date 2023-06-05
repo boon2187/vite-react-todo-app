@@ -14,7 +14,7 @@ export type Todotype = {
 };
 
 export const ToDoWrapper = () => {
-  // todoの配列をステートとして定義
+  // todoの中身を保持するステート
   const [todos, setTodos] = useState<Todotype[]>([]);
 
   // todoを追加する関数
@@ -27,6 +27,7 @@ export const ToDoWrapper = () => {
   };
 
   // todoの完了状態を変更する関数
+  // todoコンポーネントに渡す
   const toggleComplete = (id: string) => {
     setTodos(
       todos.map((todo) =>
@@ -36,11 +37,14 @@ export const ToDoWrapper = () => {
   };
 
   // todoを削除する関数
+  // todoコンポーネントに渡す
   const deleteTodo = (id: string) => {
     setTodos(todos.filter((todo) => todo.id !== id));
   };
 
-  // todoを編集する関数
+  // todoの編集を開始する関数
+  // 開始する関数なので、isEditingを反転させるだけ
+  // todoコンポーネントに渡す
   const editTodo = (id: string) => {
     // console.log(id);
     setTodos(
@@ -50,7 +54,9 @@ export const ToDoWrapper = () => {
     );
   };
 
-  // todoを更新する関数
+  // todoを実際に更新する関数
+  // 編集開始されたtodoのidと、新しいtodoを受け取ってtodoの中身を更新する
+  // editTodoFormコンポーネントに渡す
   const editTask = (id: string, newTask: string) => {
     setTodos(
       todos.map((todo) =>
@@ -65,6 +71,8 @@ export const ToDoWrapper = () => {
     <div className="TodoWrapper">
       <h1>Get Things Done!</h1>
       <TodoForm addTodo={addTodo} />
+      {/* todoの数だけTodoコンポーネントを作成する */}
+      {/* isEditingの状態によって、TodoコンポーネントとEditTodoFormコンポーネント（編集・更新用）を切り替える */}
       {todos.map((todo, index) =>
         todo.isEditing ? (
           <EditTodoForm
