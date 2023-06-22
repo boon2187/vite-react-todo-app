@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, FormControl, HStack, Input } from "@chakra-ui/react";
+import { Button, FormControl, HStack, Input, Text } from "@chakra-ui/react";
 
 // propsの型を定義
 type EditTodoFormProps = {
@@ -33,7 +33,9 @@ export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
             bg="whiteAlpha.800"
           />
           <Button type="submit" bg="#8758ff" color="white">
-            Add Task
+            <Text px="12px" fontSize="sm">
+              Update Task
+            </Text>
           </Button>
         </HStack>
       </FormControl>
