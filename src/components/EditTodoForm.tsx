@@ -30,7 +30,7 @@ export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
             placeholder="What is the task today?"
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            bg="whiteAlpha.800"
+            bg="#E2E8F0"
           />
           <Button type="submit" bg="#8758ff" color="white">
             <Text px="12px" fontSize="sm">
