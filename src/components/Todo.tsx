@@ -38,7 +38,7 @@ export const Todo = ({
       >
         {task}
       </Text>
-      <div>
+      <Flex gap={3}>
         <FontAwesomeIcon
           cursor="pointer"
           icon={faPenToSquare}
@@ -49,7 +49,7 @@ export const Todo = ({
           onClick={() => deleteTodo(id)}
           icon={faTrash}
         />
-      </div>
+      </Flex>
     </Flex>
   );
 };
