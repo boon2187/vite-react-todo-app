@@ -3,6 +3,7 @@ import { TodoForm } from "./TodoForm";
 import { v4 as uuidv4 } from "uuid";
 import { Todo } from "./Todo";
 import { EditTodoForm } from "./EditTodoForm";
+import { Box, Text } from "@chakra-ui/react";
 uuidv4();
 
 // todoの型を定義
@@ -70,8 +71,18 @@ export const ToDoWrapper = () => {
   };
 
   return (
-    <div className="TodoWrapper">
-      <h1>Get Things Done!</h1>
+    <Box
+      bg="#1a1a40"
+      mt={20}
+      p={8}
+      borderRadius={5}
+      w="80vw"
+      maxWidth="600px"
+      mx="auto"
+    >
+      <Text color="white" fontSize="3xl" textAlign="center">
+        Get Things Done!
+      </Text>
       <TodoForm addTodo={addTodo} />
       {/* todoの数だけTodoコンポーネントを作成する */}
       {/* isEditingの状態によって、TodoコンポーネントとEditTodoFormコンポーネント（編集・更新用）を切り替える */}
@@ -95,6 +106,6 @@ export const ToDoWrapper = () => {
           />
         )
       )}
-    </div>
+    </Box>
   );
 };

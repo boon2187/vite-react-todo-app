@@ -2,6 +2,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { Text, Flex } from "@chakra-ui/react";
 
 type TodoProps = {
   id: string;
@@ -21,17 +22,34 @@ export const Todo = ({
   editTodo,
 }: TodoProps) => {
   return (
-    <div className="Todo">
-      <p
+    <Flex
+      justifyContent="space-between"
+      alignItems="center"
+      bg="#8758ff"
+      color="#fff"
+      padding="0.75rem 1rem"
+      borderRadius={8}
+      mb="1rem"
+    >
+      <Text
+        cursor="pointer"
         onClick={() => toggleComplete(id)}
-        className={`${completed ? "completed" : ""}`}
+        as={`${completed ? "s" : "p"}`}
       >
         {task}
-      </p>
-      <div>
-        <FontAwesomeIcon icon={faPenToSquare} onClick={() => editTodo(id)} />
-        <FontAwesomeIcon onClick={() => deleteTodo(id)} icon={faTrash} />
-      </div>
-    </div>
+      </Text>
+      <Flex gap={3}>
+        <FontAwesomeIcon
+          cursor="pointer"
+          icon={faPenToSquare}
+          onClick={() => editTodo(id)}
+        />
+        <FontAwesomeIcon
+          cursor="pointer"
+          onClick={() => deleteTodo(id)}
+          icon={faTrash}
+        />
+      </Flex>
+    </Flex>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Button, FormControl, HStack, Input, Text } from "@chakra-ui/react";
 
 // propsの型を定義
 type EditTodoFormProps = {
@@ -21,17 +22,23 @@ export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
   };
 
   return (
-    <form className="TodoForm" onSubmit={handleSubmit}>
-      <input
-        type="text"
-        className="todo-input"
-        placeholder="Update the task"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-      />
-      <button type="submit" className="todo-btn">
-        Update Task
-      </button>
+    <form onSubmit={handleSubmit}>
+      <FormControl mt="1rem" mb="2rem">
+        <HStack>
+          <Input
+            type="text"
+            placeholder="What is the task today?"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            bg="#E2E8F0"
+          />
+          <Button type="submit" bg="#8758ff" color="white">
+            <Text px="12px" fontSize="sm">
+              Update Task
+            </Text>
+          </Button>
+        </HStack>
+      </FormControl>
     </form>
   );
 };
