@@ -71,7 +71,15 @@ export const ToDoWrapper = () => {
   };
 
   return (
-    <Box bg="#1a1a40" mt={20} p={8} borderRadius={5}>
+    <Box
+      bg="#1a1a40"
+      mt={20}
+      p={8}
+      borderRadius={5}
+      w="80vw"
+      maxWidth="600px"
+      mx="auto"
+    >
       <Text color="white" fontSize="3xl" textAlign="center">
         Get Things Done!
       </Text>
