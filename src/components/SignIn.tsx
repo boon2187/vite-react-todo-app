@@ -5,8 +5,8 @@ export const SignIn = () => {
   function signInWithGoogle() {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider);
-    const currentUser = auth.currentUser?.displayName;
-    console.log(currentUser);
+    // const currentUser = auth.currentUser?.displayName;
+    // console.log(currentUser);
   }
   return (
     <div>
