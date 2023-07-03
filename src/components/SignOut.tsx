@@ -1,7 +1,7 @@
 import { auth } from "../firebase.ts";
 import { Button } from "@chakra-ui/react";
 
-function SignOut() {
+export const SignOut = () => {
   console.log(auth.currentUser?.displayName);
   return (
     <div className="header">
@@ -9,6 +9,4 @@ function SignOut() {
       <h3>{auth.currentUser?.displayName}</h3>
     </div>
   );
-}
-
-export default SignOut;
+};
