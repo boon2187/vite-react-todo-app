@@ -31,8 +31,9 @@ export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             bg="#E2E8F0"
+            h="45px"
           />
-          <Button type="submit" bg="#8758ff" color="white">
+          <Button type="submit" bg="#8758ff" color="white" h="45px">
             <Text px="12px" fontSize="sm">
               Update Task
             </Text>
