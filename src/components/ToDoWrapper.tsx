@@ -7,6 +7,7 @@ import { Box, Text } from "@chakra-ui/react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../firebase.ts";
 import { SignIn } from "./SignIn";
+import { SignOut } from "./SignOut";
 uuidv4();
 
 // todoの型を定義
@@ -86,11 +87,12 @@ export const ToDoWrapper = () => {
       maxWidth="600px"
       mx="auto"
     >
-      <Text color="white" fontSize="3xl" textAlign="center">
-        Get Things Done!
-      </Text>
       {user ? (
         <>
+          <SignOut />
+          <Text color="white" fontSize="3xl" textAlign="center">
+            Get Things Done!
+          </Text>
           <TodoForm addTodo={addTodo} />
           {/* todoの数だけTodoコンポーネントを作成する */}
           {/* isEditingの状態によって、TodoコンポーネントとEditTodoFormコンポーネント（編集・更新用）を切り替える */}
