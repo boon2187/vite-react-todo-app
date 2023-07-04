@@ -3,8 +3,6 @@ import { Avatar, IconButton, Flex, Text } from "@chakra-ui/react";
 import { UnlockIcon } from "@chakra-ui/icons";
 
 export const SignOut = () => {
-  const photoURL = auth.currentUser?.photoURL;
-  console.log(photoURL);
   return (
     <Flex
       bg="#8758ff"
@@ -22,7 +20,7 @@ export const SignOut = () => {
         サインアウト
       </IconButton>
       <Text>{auth.currentUser?.displayName}</Text>
-      <Avatar name="login user name" src={`${photoURL}`} />
+      <Avatar name="login user name" src={`${auth.currentUser?.photoURL}`} />
     </Flex>
   );
 };
