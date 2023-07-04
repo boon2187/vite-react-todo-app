@@ -1,19 +1,28 @@
 import { auth } from "../firebase.ts";
-import { Button, Flex, Text } from "@chakra-ui/react";
+import { Avatar, IconButton, Flex, Text } from "@chakra-ui/react";
+import { UnlockIcon } from "@chakra-ui/icons";
 
 export const SignOut = () => {
-  console.log(auth.currentUser?.displayName);
+  const photoURL = auth.currentUser?.photoURL;
+  console.log(photoURL);
   return (
     <Flex
       bg="#8758ff"
       color="white"
       flexDirection="row-reverse"
       alignItems="center"
+      h="50px"
+      gap={2}
     >
-      <Button onClick={() => auth.signOut()} ml="20px">
+      <IconButton
+        aria-label="Sign Out"
+        icon={<UnlockIcon />}
+        onClick={() => auth.signOut()}
+      >
         サインアウト
-      </Button>
+      </IconButton>
       <Text>{auth.currentUser?.displayName}</Text>
+      <Avatar name="login user name" src={`${photoURL}`} />
     </Flex>
   );
 };
