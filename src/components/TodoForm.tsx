@@ -31,7 +31,7 @@ export const TodoForm = ({ addTodo }: TodoFormProps) => {
             onChange={(e) => setValue(e.target.value)}
             bg="whiteAlpha.800"
           />
-          <Button type="submit" bg="#8758ff" color="white">
+          <Button type="submit" colorScheme="purple" color="white">
             Add Task
           </Button>
         </HStack>
