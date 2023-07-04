@@ -22,7 +22,7 @@ export const TodoForm = ({ addTodo }: TodoFormProps) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <FormControl mt="1rem" mb="2rem">
+      <FormControl mt="1rem" mb="1.5rem">
         <HStack>
           <Input
             type="text"
@@ -30,8 +30,9 @@ export const TodoForm = ({ addTodo }: TodoFormProps) => {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             bg="whiteAlpha.800"
+            h="45px"
           />
-          <Button type="submit" bg="#8758ff" color="white">
+          <Button type="submit" colorScheme="purple" color="white" h="45px">
             Add Task
           </Button>
         </HStack>

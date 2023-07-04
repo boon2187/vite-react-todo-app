@@ -4,6 +4,10 @@ import { v4 as uuidv4 } from "uuid";
 import { Todo } from "./Todo";
 import { EditTodoForm } from "./EditTodoForm";
 import { Box, Text } from "@chakra-ui/react";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../firebase.ts";
+import { SignIn } from "./SignIn";
+import { SignOut } from "./SignOut";
 uuidv4();
 
 // todoの型を定義
@@ -17,6 +21,9 @@ type Todotype = {
 export const ToDoWrapper = () => {
   // todoの中身を保持するステート
   const [todos, setTodos] = useState<Todotype[]>([]);
+
+  // ログインしているユーザーの情報を取得
+  const [user] = useAuthState(auth);
 
   // todoを追加する関数
   const addTodo = (todo: string) => {
@@ -80,31 +87,38 @@ export const ToDoWrapper = () => {
       maxWidth="600px"
       mx="auto"
     >
-      <Text color="white" fontSize="3xl" textAlign="center">
-        Get Things Done!
-      </Text>
-      <TodoForm addTodo={addTodo} />
-      {/* todoの数だけTodoコンポーネントを作成する */}
-      {/* isEditingの状態によって、TodoコンポーネントとEditTodoFormコンポーネント（編集・更新用）を切り替える */}
-      {todos.map((todo, index) =>
-        todo.isEditing ? (
-          <EditTodoForm
-            key={index}
-            id={todo.id}
-            task={todo.task}
-            editTask={editTask}
-          />
-        ) : (
-          <Todo
-            key={index}
-            id={todo.id}
-            task={todo.task}
-            completed={todo.completed}
-            toggleComplete={toggleComplete}
-            deleteTodo={deleteTodo}
-            editTodo={editTodo}
-          />
-        )
+      {user ? (
+        <>
+          <SignOut />
+          <Text color="white" fontSize="3xl" textAlign="center">
+            Get Things Done!
+          </Text>
+          <TodoForm addTodo={addTodo} />
+          {/* todoの数だけTodoコンポーネントを作成する */}
+          {/* isEditingの状態によって、TodoコンポーネントとEditTodoFormコンポーネント（編集・更新用）を切り替える */}
+          {todos.map((todo, index) =>
+            todo.isEditing ? (
+              <EditTodoForm
+                key={index}
+                id={todo.id}
+                task={todo.task}
+                editTask={editTask}
+              />
+            ) : (
+              <Todo
+                key={index}
+                id={todo.id}
+                task={todo.task}
+                completed={todo.completed}
+                toggleComplete={toggleComplete}
+                deleteTodo={deleteTodo}
+                editTodo={editTodo}
+              />
+            )
+          )}
+        </>
+      ) : (
+        <SignIn />
       )}
     </Box>
   );
