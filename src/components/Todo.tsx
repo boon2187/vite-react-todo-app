@@ -1,8 +1,5 @@
-// import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import { Text, Flex } from "@chakra-ui/react";
+import { Text, Flex, IconButton } from "@chakra-ui/react";
+import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
 
 type TodoProps = {
   id: string;
@@ -39,15 +36,23 @@ export const Todo = ({
         {task}
       </Text>
       <Flex gap={3}>
-        <FontAwesomeIcon
-          cursor="pointer"
-          icon={faPenToSquare}
+        <IconButton
+          size="xs"
+          fontSize="18px"
+          aria-label="Edit Todo"
+          bg="#8758ff"
+          color="#fff"
+          icon={<EditIcon />}
           onClick={() => editTodo(id)}
         />
-        <FontAwesomeIcon
-          cursor="pointer"
+        <IconButton
+          size="xs"
+          fontSize="18px"
+          aria-label="Delete Todo"
+          bg="#8758ff"
+          color="#fff"
           onClick={() => deleteTodo(id)}
-          icon={faTrash}
+          icon={<DeleteIcon />}
         />
       </Flex>
     </Flex>
