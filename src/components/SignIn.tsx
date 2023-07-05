@@ -1,6 +1,8 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../firebase";
-import { Button } from "@chakra-ui/react";
+import { Button, Flex } from "@chakra-ui/react";
+import { ArrowRightIcon } from "@chakra-ui/icons";
+
 export const SignIn = () => {
   async function signInWithGoogle() {
     const provider = new GoogleAuthProvider();
@@ -9,8 +11,11 @@ export const SignIn = () => {
     // console.log(currentUser);
   }
   return (
-    <div>
-      <Button onClick={signInWithGoogle}>Googleのアカウントでログイン</Button>
-    </div>
+    <Flex>
+      <Button mx="auto" colorScheme="teal" onClick={signInWithGoogle}>
+        Googleのアカウントでログイン
+        <ArrowRightIcon ml="10px" />
+      </Button>
+    </Flex>
   );
 };
