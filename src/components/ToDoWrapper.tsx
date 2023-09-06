@@ -16,6 +16,7 @@ type Todotype = {
   task: string;
   completed: boolean;
   isEditing: boolean;
+  uid: string;
 };
 
 export const ToDoWrapper = () => {
@@ -29,7 +30,13 @@ export const ToDoWrapper = () => {
   const addTodo = (todo: string) => {
     setTodos([
       ...todos,
-      { id: uuidv4(), task: todo, completed: false, isEditing: false },
+      {
+        id: uuidv4(),
+        task: todo,
+        completed: false,
+        isEditing: false,
+        uid: auth.currentUser?.uid as string,
+      },
     ]);
     // console.log(todos);
   };
