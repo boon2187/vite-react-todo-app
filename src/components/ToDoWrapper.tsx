@@ -5,10 +5,10 @@ import { Todo } from "./Todo";
 import { EditTodoForm } from "./EditTodoForm";
 import { Box, Text } from "@chakra-ui/react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../firebase.ts";
+import { auth, db } from "../firebase.ts";
 import { SignIn } from "./SignIn";
 import { SignOut } from "./SignOut";
-import firebase from "firebase/app";
+// import firebase from "firebase/app";
 uuidv4();
 
 // todoの型を定義
@@ -88,24 +88,21 @@ export const ToDoWrapper = () => {
   // useEffectを使って、起動時にFirestoreからtodoを取得する
   useEffect(() => {
     // ログインしているユーザーのtodoのみ取得する
-    const unSub = auth.onAuthStateChanged((user) => {
-      if (user) {
-        const uid = user.uid;
-        const db = firebase.firestore();
-        const todosRef = db.collection("todos").doc(uid);
-        todosRef.get().then((doc) => {
-          if (doc.exists) {
-            const data = doc.data();
-            if (data) {
-              setTodos(data.todos);
-            }
-          } else {
-            console.log("No such document!");
-          }
-        });
-      }
-    });
-    return () => unSub();
+    db.collection("todos")
+      .where("uid", "==", auth.currentUser?.uid)
+      .orderBy("createdAt")
+      .onlimit(30)
+      .onSnapshot((snapshot) => {
+        setTodos(
+          snapshot.docs.map((doc) => ({
+            id: doc.id,
+            task: doc.data().task,
+            completed: doc.data().completed,
+            isEditing: false,
+            uid: doc.data().uid,
+          }))
+        );
+      });
   }, []);
 
   return (
