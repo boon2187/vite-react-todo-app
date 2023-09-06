@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TodoForm } from "./TodoForm";
 import { v4 as uuidv4 } from "uuid";
 import { Todo } from "./Todo";
@@ -8,6 +8,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../firebase.ts";
 import { SignIn } from "./SignIn";
 import { SignOut } from "./SignOut";
+import firebase from "firebase/app";
 uuidv4();
 
 // todoの型を定義
@@ -83,6 +84,29 @@ export const ToDoWrapper = () => {
       )
     );
   };
+
+  // useEffectを使って、起動時にFirestoreからtodoを取得する
+  useEffect(() => {
+    // ログインしているユーザーのtodoのみ取得する
+    const unSub = auth.onAuthStateChanged((user) => {
+      if (user) {
+        const uid = user.uid;
+        const db = firebase.firestore();
+        const todosRef = db.collection("todos").doc(uid);
+        todosRef.get().then((doc) => {
+          if (doc.exists) {
+            const data = doc.data();
+            if (data) {
+              setTodos(data.todos);
+            }
+          } else {
+            console.log("No such document!");
+          }
+        });
+      }
+    });
+    return () => unSub();
+  }, []);
 
   return (
     <Box
