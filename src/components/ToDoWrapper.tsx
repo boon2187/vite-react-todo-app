@@ -32,7 +32,7 @@ export const ToDoWrapper = () => {
     setTodos([
       ...todos,
       {
-        id: uuidv4(),
+        id: uuidv4(), // ここをdoc.idにすればいい気がする
         task: todo,
         completed: false,
         isEditing: false,
@@ -55,6 +55,8 @@ export const ToDoWrapper = () => {
   // todoを削除する関数
   // todoコンポーネントに渡す
   const deleteTodo = (id: string) => {
+    // 削除の手順は調べる必要あり
+    // ローカルのtodosを削除して、Firestoreからも削除するがいいのかな…と思う
     setTodos(todos.filter((todo) => todo.id !== id));
   };
 
@@ -75,6 +77,7 @@ export const ToDoWrapper = () => {
   // isEditingを反転させて戻す
   // editTodoFormコンポーネントに渡す
   const editTask = (id: string, newTask: string) => {
+    // どういう手順でEditし、更新するのか調べる必要あり
     setTodos(
       todos.map((todo) =>
         // 編集するidと一致するtodoのtaskを新しいtaskに更新する
