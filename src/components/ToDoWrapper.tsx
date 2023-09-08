@@ -8,7 +8,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../firebase.ts";
 import { SignIn } from "./SignIn";
 import { SignOut } from "./SignOut";
-import { Auth } from "firebase/auth";
+import { beforeAuthStateChanged } from "@firebase/auth/dist/auth-public";
 // import firebase from "firebase/app";
 uuidv4();
 
@@ -26,7 +26,7 @@ export const ToDoWrapper = () => {
   const [todos, setTodos] = useState<Todotype[]>([]);
 
   // ログインしているユーザーの情報を取得
-  const [user] = useAuthState(auth);
+  const [user] = useAuthState(auth as any);
   // const user = auth.currentUser;
 
   // todoを追加する関数
