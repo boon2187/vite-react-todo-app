@@ -31,6 +31,7 @@ export const ToDoWrapper = () => {
 
   // todoを追加する関数
   const addTodo = (todo: string) => {
+    // 新しいtodoを作成する
     const newTodo = {
       id: uuidv4(),
       task: todo,
@@ -38,7 +39,10 @@ export const ToDoWrapper = () => {
       isEditing: false,
       uid: auth.currentUser?.uid as string,
     };
+
+    // 新しいtodoをtodosステートに追加する
     setTodos([...todos, newTodo]);
+
     // firestoreにnewTodoをドキュメントidをidとして追加する
     db.collection('todos').doc(newTodo.id).set({
       task: newTodo.task,
