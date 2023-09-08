@@ -1,6 +1,6 @@
-import { auth } from "../firebase.ts";
-import { Avatar, IconButton, Flex, Text } from "@chakra-ui/react";
-import { UnlockIcon } from "@chakra-ui/icons";
+import { auth } from '../firebase.ts';
+import { Avatar, IconButton, Flex, Text } from '@chakra-ui/react';
+import { UnlockIcon } from '@chakra-ui/icons';
 
 export const SignOut = () => {
   return (

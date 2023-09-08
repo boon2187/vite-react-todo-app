@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Button, FormControl, HStack, Input, Text } from "@chakra-ui/react";
+import React, { useState } from 'react';
+import { Button, FormControl, HStack, Input, Text } from '@chakra-ui/react';
 
 // propsの型を定義
 type EditTodoFormProps = {
@@ -17,7 +17,7 @@ export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
     e.preventDefault();
     // idがidのtodoに対して、formの内容(value)でtaskの内容を更新してformの内容を空にする
     editTask(id, value);
-    setValue("");
+    setValue('');
     // console.log(value);
   };
 
