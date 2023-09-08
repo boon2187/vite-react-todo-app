@@ -1,5 +1,5 @@
-import { Button, FormControl, HStack, Input } from "@chakra-ui/react";
-import React, { useState } from "react";
+import { Button, FormControl, HStack, Input } from '@chakra-ui/react';
+import React, { useState } from 'react';
 
 // propsの型を定義
 type TodoFormProps = {
@@ -9,7 +9,7 @@ type TodoFormProps = {
 
 export const TodoForm = ({ addTodo }: TodoFormProps) => {
   // formの内容を保持するstate
-  const [value, setValue] = useState<string>("");
+  const [value, setValue] = useState<string>('');
 
   // formのsubmit時の処理
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -17,7 +17,7 @@ export const TodoForm = ({ addTodo }: TodoFormProps) => {
     // formの内容(value)を追加してformの内容を空にする
     if (!value) return;
     addTodo(value);
-    setValue("");
+    setValue('');
   };
 
   return (
