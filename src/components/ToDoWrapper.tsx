@@ -8,8 +8,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../firebase.ts";
 import { SignIn } from "./SignIn";
 import { SignOut } from "./SignOut";
-import { beforeAuthStateChanged } from "@firebase/auth/dist/auth-public";
-// import firebase from "firebase/app";
+
 uuidv4();
 
 // todoの型を定義
