@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
-import { TodoForm } from "./TodoForm";
-import { v4 as uuidv4 } from "uuid";
-import { Todo } from "./Todo";
-import { EditTodoForm } from "./EditTodoForm";
-import { Box, Text } from "@chakra-ui/react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, db } from "../firebase.ts";
-import { SignIn } from "./SignIn";
-import { SignOut } from "./SignOut";
+import { useEffect, useState } from 'react';
+import { TodoForm } from './TodoForm';
+import { v4 as uuidv4 } from 'uuid';
+import { Todo } from './Todo';
+import { EditTodoForm } from './EditTodoForm';
+import { Box, Text } from '@chakra-ui/react';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth, db } from '../firebase.ts';
+import { SignIn } from './SignIn';
+import { SignOut } from './SignOut';
 
 uuidv4();
 
@@ -30,16 +30,14 @@ export const ToDoWrapper = () => {
 
   // todoを追加する関数
   const addTodo = (todo: string) => {
-    setTodos([
-      ...todos,
-      {
-        id: uuidv4(), // ここをdoc.idにすればいい気がする
-        task: todo,
-        completed: false,
-        isEditing: false,
-        uid: auth.currentUser?.uid as string,
-      },
-    ]);
+    const newTodo = {
+      id: uuidv4(),
+      task: todo,
+      completed: false,
+      isEditing: false,
+      uid: auth.currentUser?.uid as string,
+    };
+    setTodos([...todos, newTodo]);
     // console.log(todos);
   };
 
@@ -48,8 +46,8 @@ export const ToDoWrapper = () => {
   const toggleComplete = (id: string) => {
     setTodos(
       todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo,
+      ),
     );
   };
 
@@ -68,8 +66,8 @@ export const ToDoWrapper = () => {
     // ボタンを押したtodoのidと一致するtodoのisEditingを反転させる
     setTodos(
       todos.map((todo) =>
-        todo.id === id ? { ...todo, isEditing: !todo.isEditing } : todo
-      )
+        todo.id === id ? { ...todo, isEditing: !todo.isEditing } : todo,
+      ),
     );
   };
 
@@ -84,8 +82,8 @@ export const ToDoWrapper = () => {
         // 編集するidと一致するtodoのtaskを新しいtaskに更新する
         todo.id === id
           ? { ...todo, task: newTask, isEditing: !todo.isEditing }
-          : todo
-      )
+          : todo,
+      ),
     );
   };
 
@@ -93,9 +91,9 @@ export const ToDoWrapper = () => {
   useEffect(() => {
     // ログインしているユーザーのtodoのみ取得する
     console.log(auth.currentUser?.uid);
-    db.collection("todos")
-      .where("uid", "==", `${auth.currentUser?.uid}`)
-      .orderBy("createdAt")
+    db.collection('todos')
+      .where('uid', '==', `${auth.currentUser?.uid}`)
+      .orderBy('createdAt')
       .limit(30)
       .onSnapshot((snapshot) => {
         setTodos(
@@ -105,7 +103,7 @@ export const ToDoWrapper = () => {
             completed: doc.data().completed,
             isEditing: false,
             uid: doc.data().uid,
-          }))
+          })),
         );
       });
   }, [user]);
@@ -147,7 +145,7 @@ export const ToDoWrapper = () => {
                 deleteTodo={deleteTodo}
                 editTodo={editTodo}
               />
-            )
+            ),
           )}
         </>
       ) : (
