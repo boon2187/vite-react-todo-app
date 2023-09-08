@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TodoForm } from "./TodoForm";
 import { v4 as uuidv4 } from "uuid";
 import { Todo } from "./Todo";
 import { EditTodoForm } from "./EditTodoForm";
 import { Box, Text } from "@chakra-ui/react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../firebase.ts";
+import { auth, db } from "../firebase.ts";
 import { SignIn } from "./SignIn";
 import { SignOut } from "./SignOut";
+import { Auth } from "firebase/auth";
+// import firebase from "firebase/app";
 uuidv4();
 
 // todoの型を定義
@@ -16,6 +18,7 @@ type Todotype = {
   task: string;
   completed: boolean;
   isEditing: boolean;
+  uid: string;
 };
 
 export const ToDoWrapper = () => {
@@ -24,12 +27,19 @@ export const ToDoWrapper = () => {
 
   // ログインしているユーザーの情報を取得
   const [user] = useAuthState(auth);
+  // const user = auth.currentUser;
 
   // todoを追加する関数
   const addTodo = (todo: string) => {
     setTodos([
       ...todos,
-      { id: uuidv4(), task: todo, completed: false, isEditing: false },
+      {
+        id: uuidv4(), // ここをdoc.idにすればいい気がする
+        task: todo,
+        completed: false,
+        isEditing: false,
+        uid: auth.currentUser?.uid as string,
+      },
     ]);
     // console.log(todos);
   };
@@ -47,6 +57,8 @@ export const ToDoWrapper = () => {
   // todoを削除する関数
   // todoコンポーネントに渡す
   const deleteTodo = (id: string) => {
+    // 削除の手順は調べる必要あり
+    // ローカルのtodosを削除して、Firestoreからも削除するがいいのかな…と思う
     setTodos(todos.filter((todo) => todo.id !== id));
   };
 
@@ -67,6 +79,7 @@ export const ToDoWrapper = () => {
   // isEditingを反転させて戻す
   // editTodoFormコンポーネントに渡す
   const editTask = (id: string, newTask: string) => {
+    // どういう手順でEditし、更新するのか調べる必要あり
     setTodos(
       todos.map((todo) =>
         // 編集するidと一致するtodoのtaskを新しいtaskに更新する
@@ -76,6 +89,27 @@ export const ToDoWrapper = () => {
       )
     );
   };
+
+  // useEffectを使って、ログイン時にFirestoreからtodoを取得する
+  useEffect(() => {
+    // ログインしているユーザーのtodoのみ取得する
+    console.log(auth.currentUser?.uid);
+    db.collection("todos")
+      .where("uid", "==", `${auth.currentUser?.uid}`)
+      .orderBy("createdAt")
+      .limit(30)
+      .onSnapshot((snapshot) => {
+        setTodos(
+          snapshot.docs.map((doc) => ({
+            id: doc.id,
+            task: doc.data().task,
+            completed: doc.data().completed,
+            isEditing: false,
+            uid: doc.data().uid,
+          }))
+        );
+      });
+  }, [user]);
 
   return (
     <Box
