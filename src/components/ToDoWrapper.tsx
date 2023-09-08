@@ -8,6 +8,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from '../firebase.ts';
 import { SignIn } from './SignIn';
 import { SignOut } from './SignOut';
+import firebase from 'firebase/compat/app';
 
 uuidv4();
 
@@ -38,6 +39,14 @@ export const ToDoWrapper = () => {
       uid: auth.currentUser?.uid as string,
     };
     setTodos([...todos, newTodo]);
+    // firestoreにnewTodoをドキュメントidをidとして追加する
+    db.collection('todos').doc(newTodo.id).set({
+      task: newTodo.task,
+      completed: newTodo.completed,
+      isEdting: newTodo.isEditing,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      uid: newTodo.uid,
+    });
     // console.log(todos);
   };
 
