@@ -56,7 +56,7 @@ export const ToDoWrapper = () => {
 
   // todoの完了状態を変更する関数
   // todoコンポーネントに渡す
-  const toggleComplete = (id: string) => {
+  const toggleComplete = async (id: string) => {
     // ボタンを押したtodoのidと一致するtodoのcompletedを反転させる
     setTodos(
       todos.map((todo) =>
@@ -64,7 +64,8 @@ export const ToDoWrapper = () => {
       ),
     );
     // firestoreの該当のtodoのcompletedを反転させる
-    db.collection('todos')
+    await db
+      .collection('todos')
       .doc(id)
       .update({
         completed: !todos.find((todo) => todo.id === id)?.completed,
