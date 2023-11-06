@@ -47,7 +47,7 @@ export const ToDoWrapper = () => {
     db.collection('todos').doc(newTodo.id).set({
       task: newTodo.task,
       completed: newTodo.completed,
-      isEdting: newTodo.isEditing,
+      isEditing: newTodo.isEditing,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       uid: newTodo.uid,
     });
@@ -85,9 +85,18 @@ export const ToDoWrapper = () => {
   // todoの編集を開始する関数
   // 開始する関数なので、isEditingを反転させるだけ
   // todoコンポーネントに渡す
-  const editTodo = (id: string) => {
+  const editTodo = async (id: string) => {
+    // firestoreの該当のtodoのisEditingを反転させる
+    await db
+      .collection('todos')
+      .doc(id)
+      .update({
+        isEditing: !todos.find((todo) => todo.id === id)?.isEditing,
+      });
+
     // ボタンを押したtodoのidと一致するtodoのisEditingを反転させる
     setTodos(
+      // ローカルのtodosを更新する
       todos.map((todo) =>
         todo.id === id ? { ...todo, isEditing: !todo.isEditing } : todo,
       ),
