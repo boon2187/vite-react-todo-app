@@ -108,7 +108,6 @@ export const ToDoWrapper = () => {
   // isEditingを反転させて戻す
   // editTodoFormコンポーネントに渡す
   const editTask = (id: string, newTask: string) => {
-    // どういう手順でEditし、更新するのか調べる必要あり
     setTodos(
       todos.map((todo) =>
         // 編集するidと一致するtodoのtaskを新しいtaskに更新する
@@ -117,6 +116,14 @@ export const ToDoWrapper = () => {
           : todo,
       ),
     );
+
+    // firestoreの該当のtodoのtaskを更新する
+    db.collection('todos')
+      .doc(id)
+      .update({
+        task: newTask,
+        isEditing: !todos.find((todo) => todo.id === id)?.isEditing,
+      });
   };
 
   // useEffectを使って、ログイン時にFirestoreからtodoを取得する
@@ -133,7 +140,7 @@ export const ToDoWrapper = () => {
             id: doc.id,
             task: doc.data().task,
             completed: doc.data().completed,
-            isEditing: false,
+            isEditing: doc.data().isEditing,
             uid: doc.data().uid,
           })),
         );
