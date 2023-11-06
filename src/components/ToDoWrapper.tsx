@@ -57,11 +57,18 @@ export const ToDoWrapper = () => {
   // todoの完了状態を変更する関数
   // todoコンポーネントに渡す
   const toggleComplete = (id: string) => {
+    // ボタンを押したtodoのidと一致するtodoのcompletedを反転させる
     setTodos(
       todos.map((todo) =>
         todo.id === id ? { ...todo, completed: !todo.completed } : todo,
       ),
     );
+    // firestoreの該当のtodoのcompletedを反転させる
+    db.collection('todos')
+      .doc(id)
+      .update({
+        completed: !todos.find((todo) => todo.id === id)?.completed,
+      });
   };
 
   // todoを削除する関数
@@ -70,6 +77,9 @@ export const ToDoWrapper = () => {
     // 削除の手順は調べる必要あり
     // ローカルのtodosを削除して、Firestoreからも削除するがいいのかな…と思う
     setTodos(todos.filter((todo) => todo.id !== id));
+
+    // 該当のtodoをfirestoreからも削除する
+    db.collection('todos').doc(id).delete();
   };
 
   // todoの編集を開始する関数
