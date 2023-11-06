@@ -47,7 +47,7 @@ export const ToDoWrapper = () => {
     db.collection('todos').doc(newTodo.id).set({
       task: newTodo.task,
       completed: newTodo.completed,
-      isEdting: newTodo.isEditing,
+      isEditing: newTodo.isEditing,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       uid: newTodo.uid,
     });
@@ -56,7 +56,7 @@ export const ToDoWrapper = () => {
 
   // todoの完了状態を変更する関数
   // todoコンポーネントに渡す
-  const toggleComplete = (id: string) => {
+  const toggleComplete = async (id: string) => {
     // ボタンを押したtodoのidと一致するtodoのcompletedを反転させる
     setTodos(
       todos.map((todo) =>
@@ -64,7 +64,8 @@ export const ToDoWrapper = () => {
       ),
     );
     // firestoreの該当のtodoのcompletedを反転させる
-    db.collection('todos')
+    await db
+      .collection('todos')
       .doc(id)
       .update({
         completed: !todos.find((todo) => todo.id === id)?.completed,
@@ -85,9 +86,18 @@ export const ToDoWrapper = () => {
   // todoの編集を開始する関数
   // 開始する関数なので、isEditingを反転させるだけ
   // todoコンポーネントに渡す
-  const editTodo = (id: string) => {
+  const editTodo = async (id: string) => {
+    // firestoreの該当のtodoのisEditingを反転させる
+    await db
+      .collection('todos')
+      .doc(id)
+      .update({
+        isEditing: !todos.find((todo) => todo.id === id)?.isEditing,
+      });
+
     // ボタンを押したtodoのidと一致するtodoのisEditingを反転させる
     setTodos(
+      // ローカルのtodosを更新する
       todos.map((todo) =>
         todo.id === id ? { ...todo, isEditing: !todo.isEditing } : todo,
       ),
@@ -99,7 +109,6 @@ export const ToDoWrapper = () => {
   // isEditingを反転させて戻す
   // editTodoFormコンポーネントに渡す
   const editTask = (id: string, newTask: string) => {
-    // どういう手順でEditし、更新するのか調べる必要あり
     setTodos(
       todos.map((todo) =>
         // 編集するidと一致するtodoのtaskを新しいtaskに更新する
@@ -108,6 +117,14 @@ export const ToDoWrapper = () => {
           : todo,
       ),
     );
+
+    // firestoreの該当のtodoのtaskを更新する
+    db.collection('todos')
+      .doc(id)
+      .update({
+        task: newTask,
+        isEditing: !todos.find((todo) => todo.id === id)?.isEditing,
+      });
   };
 
   // useEffectを使って、ログイン時にFirestoreからtodoを取得する
@@ -124,7 +141,7 @@ export const ToDoWrapper = () => {
             id: doc.id,
             task: doc.data().task,
             completed: doc.data().completed,
-            isEditing: false,
+            isEditing: doc.data().isEditing,
             uid: doc.data().uid,
           })),
         );
