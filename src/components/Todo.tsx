@@ -1,5 +1,5 @@
-import { Text, Flex, IconButton } from "@chakra-ui/react";
-import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
+import { Text, Flex, IconButton } from '@chakra-ui/react';
+import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 
 type TodoProps = {
   id: string;
@@ -31,7 +31,7 @@ export const Todo = ({
       <Text
         cursor="pointer"
         onClick={() => toggleComplete(id)}
-        as={`${completed ? "s" : "p"}`}
+        as={`${completed ? 's' : 'p'}`}
       >
         {task}
       </Text>

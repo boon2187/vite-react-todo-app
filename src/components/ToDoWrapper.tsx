@@ -1,13 +1,15 @@
-import { useState } from "react";
-import { TodoForm } from "./TodoForm";
-import { v4 as uuidv4 } from "uuid";
-import { Todo } from "./Todo";
-import { EditTodoForm } from "./EditTodoForm";
-import { Box, Text } from "@chakra-ui/react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../firebase.ts";
-import { SignIn } from "./SignIn";
-import { SignOut } from "./SignOut";
+import { useEffect, useState } from 'react';
+import { TodoForm } from './TodoForm';
+import { v4 as uuidv4 } from 'uuid';
+import { Todo } from './Todo';
+import { EditTodoForm } from './EditTodoForm';
+import { Box, Text } from '@chakra-ui/react';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth, db } from '../firebase.ts';
+import { SignIn } from './SignIn';
+import { SignOut } from './SignOut';
+import firebase from 'firebase/compat/app';
+
 uuidv4();
 
 // todoの型を定義
@@ -16,6 +18,7 @@ type Todotype = {
   task: string;
   completed: boolean;
   isEditing: boolean;
+  uid: string;
 };
 
 export const ToDoWrapper = () => {
@@ -23,42 +26,81 @@ export const ToDoWrapper = () => {
   const [todos, setTodos] = useState<Todotype[]>([]);
 
   // ログインしているユーザーの情報を取得
-  const [user] = useAuthState(auth);
+  const [user] = useAuthState(auth as any);
+  // const user = auth.currentUser;
 
   // todoを追加する関数
   const addTodo = (todo: string) => {
-    setTodos([
-      ...todos,
-      { id: uuidv4(), task: todo, completed: false, isEditing: false },
-    ]);
+    // 新しいtodoを作成する
+    const newTodo = {
+      id: uuidv4(),
+      task: todo,
+      completed: false,
+      isEditing: false,
+      uid: auth.currentUser?.uid as string,
+    };
+
+    // 新しいtodoをtodosステートに追加する
+    setTodos([...todos, newTodo]);
+
+    // firestoreにnewTodoをドキュメントidをidとして追加する
+    db.collection('todos').doc(newTodo.id).set({
+      task: newTodo.task,
+      completed: newTodo.completed,
+      isEditing: newTodo.isEditing,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      uid: newTodo.uid,
+    });
     // console.log(todos);
   };
 
   // todoの完了状態を変更する関数
   // todoコンポーネントに渡す
-  const toggleComplete = (id: string) => {
+  const toggleComplete = async (id: string) => {
+    // ボタンを押したtodoのidと一致するtodoのcompletedを反転させる
     setTodos(
       todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo,
+      ),
     );
+    // firestoreの該当のtodoのcompletedを反転させる
+    await db
+      .collection('todos')
+      .doc(id)
+      .update({
+        completed: !todos.find((todo) => todo.id === id)?.completed,
+      });
   };
 
   // todoを削除する関数
   // todoコンポーネントに渡す
   const deleteTodo = (id: string) => {
+    // 削除の手順は調べる必要あり
+    // ローカルのtodosを削除して、Firestoreからも削除するがいいのかな…と思う
     setTodos(todos.filter((todo) => todo.id !== id));
+
+    // 該当のtodoをfirestoreからも削除する
+    db.collection('todos').doc(id).delete();
   };
 
   // todoの編集を開始する関数
   // 開始する関数なので、isEditingを反転させるだけ
   // todoコンポーネントに渡す
-  const editTodo = (id: string) => {
+  const editTodo = async (id: string) => {
+    // firestoreの該当のtodoのisEditingを反転させる
+    await db
+      .collection('todos')
+      .doc(id)
+      .update({
+        isEditing: !todos.find((todo) => todo.id === id)?.isEditing,
+      });
+
     // ボタンを押したtodoのidと一致するtodoのisEditingを反転させる
     setTodos(
+      // ローカルのtodosを更新する
       todos.map((todo) =>
-        todo.id === id ? { ...todo, isEditing: !todo.isEditing } : todo
-      )
+        todo.id === id ? { ...todo, isEditing: !todo.isEditing } : todo,
+      ),
     );
   };
 
@@ -72,10 +114,39 @@ export const ToDoWrapper = () => {
         // 編集するidと一致するtodoのtaskを新しいtaskに更新する
         todo.id === id
           ? { ...todo, task: newTask, isEditing: !todo.isEditing }
-          : todo
-      )
+          : todo,
+      ),
     );
+
+    // firestoreの該当のtodoのtaskを更新する
+    db.collection('todos')
+      .doc(id)
+      .update({
+        task: newTask,
+        isEditing: !todos.find((todo) => todo.id === id)?.isEditing,
+      });
   };
+
+  // useEffectを使って、ログイン時にFirestoreからtodoを取得する
+  useEffect(() => {
+    // ログインしているユーザーのtodoのみ取得する
+    console.log(auth.currentUser?.uid);
+    db.collection('todos')
+      .where('uid', '==', `${auth.currentUser?.uid}`)
+      .orderBy('createdAt')
+      .limit(30)
+      .onSnapshot((snapshot) => {
+        setTodos(
+          snapshot.docs.map((doc) => ({
+            id: doc.id,
+            task: doc.data().task,
+            completed: doc.data().completed,
+            isEditing: doc.data().isEditing,
+            uid: doc.data().uid,
+          })),
+        );
+      });
+  }, [user]);
 
   return (
     <Box
@@ -114,7 +185,7 @@ export const ToDoWrapper = () => {
                 deleteTodo={deleteTodo}
                 editTodo={editTodo}
               />
-            )
+            ),
           )}
         </>
       ) : (

@@ -1,6 +1,6 @@
-import * as firebase from "firebase/app";
-import { Auth, getAuth } from "firebase/auth";
-import { Firestore, getFirestore } from "firebase/firestore";
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import 'firebase/compat/firestore';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -13,14 +13,13 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-if (typeof window !== "undefined" && !firebase.getApps().length) {
-  firebase.initializeApp(firebaseConfig);
-}
+const app = firebase.initializeApp(firebaseConfig);
 
-export default firebase;
+// export default firebase;
 // firestoreを使うための準備
-const getFirebaseDb = (): Firestore => getFirestore();
-export const db = getFirebaseDb();
+const db = app.firestore();
+
 // firebaseのauthを使うための準備
-const getFirebaseAuth = (): Auth => getAuth();
-export const auth = getFirebaseAuth();
+const auth = app.auth();
+
+export { db, auth };
