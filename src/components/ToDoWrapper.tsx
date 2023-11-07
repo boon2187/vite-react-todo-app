@@ -151,12 +151,12 @@ export const ToDoWrapper = () => {
   return (
     <Box
       bg="#1a1a40"
-      mt={20}
-      p={8}
-      borderRadius={5}
-      w="80vw"
-      maxWidth="600px"
+      mt={{ base: '3', md: '20' }}
       mx="auto"
+      p={{ base: '2', md: '8' }}
+      borderRadius={{ base: '0', md: '5' }}
+      w={{ base: '95vw', md: '80vs' }}
+      maxWidth="600px"
     >
       {user ? (
         <>
