@@ -129,23 +129,26 @@ export const ToDoWrapper = () => {
 
   // useEffectを使って、ログイン時にFirestoreからtodoを取得する
   useEffect(() => {
+    (async () => {
+      await db
+        .collection('todos')
+        .where('uid', '==', `${auth.currentUser?.uid}`)
+        .orderBy('createdAt')
+        .limit(30)
+        .onSnapshot((snapshot) => {
+          setTodos(
+            snapshot.docs.map((doc) => ({
+              id: doc.id,
+              task: doc.data().task,
+              completed: doc.data().completed,
+              isEditing: doc.data().isEditing,
+              uid: doc.data().uid,
+            })),
+          );
+        });
+    })();
     // ログインしているユーザーのtodoのみ取得する
     console.log(auth.currentUser?.uid);
-    db.collection('todos')
-      .where('uid', '==', `${auth.currentUser?.uid}`)
-      .orderBy('createdAt')
-      .limit(30)
-      .onSnapshot((snapshot) => {
-        setTodos(
-          snapshot.docs.map((doc) => ({
-            id: doc.id,
-            task: doc.data().task,
-            completed: doc.data().completed,
-            isEditing: doc.data().isEditing,
-            uid: doc.data().uid,
-          })),
-        );
-      });
   }, [user]);
 
   return (
