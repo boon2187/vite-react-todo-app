@@ -12,36 +12,36 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@chakra-ui/icons": "^2.1.0",
-    "@chakra-ui/react": "^2.8.0",
+    "@chakra-ui/icons": "^2.1.1",
+    "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@fortawesome/fontawesome-svg-core": "^6.4.2",
     "@fortawesome/free-regular-svg-icons": "^6.4.2",
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
-    "firebase": "^10.3.0",
-    "framer-motion": "^10.16.1",
+    "firebase": "^10.6.0",
+    "framer-motion": "^10.16.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-firebase-hooks": "^5.1.1",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@types/react": "^18.2.21",
-    "@types/react-dom": "^18.2.7",
-    "@types/uuid": "^9.0.2",
-    "@typescript-eslint/eslint-plugin": "^6.4.1",
-    "@typescript-eslint/parser": "^6.4.1",
-    "@vitejs/plugin-react": "^4.0.4",
-    "eslint": "^8.47.0",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@types/uuid": "^9.0.7",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
+    "@vitejs/plugin-react": "^4.1.1",
+    "eslint": "^8.53.0",
     "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.3",
-    "prettier": "^3.0.2",
-    "typescript": "^5.1.6",
-    "vite": "^4.4.9"
+    "eslint-plugin-react-refresh": "^0.4.4",
+    "prettier": "^3.0.3",
+    "typescript": "^5.2.2",
+    "vite": "^4.5.0"
   }
 }
