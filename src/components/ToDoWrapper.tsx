@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { TodoForm } from './TodoForm';
 import { v4 as uuidv4 } from 'uuid';
-import { Todo } from './Todo';
+// import { Todo } from './Todo';
 import { EditTodoForm } from './EditTodoForm';
 import { Box, Text } from '@chakra-ui/react';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -9,6 +9,21 @@ import { auth, db } from '../firebase.ts';
 import { SignIn } from './SignIn';
 import { SignOut } from './SignOut';
 import firebase from 'firebase/compat/app';
+import { SortableTodo } from './SortableTodo';
+import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 
 uuidv4();
 
@@ -151,6 +166,25 @@ export const ToDoWrapper = () => {
     console.log(auth.currentUser?.uid);
   }, [user]);
 
+  // DnDのため
+  // センサーを使って、ドラッグアンドドロップの機能を実装する
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      setTodos((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
   return (
     <Box
       bg="#1a1a40"
@@ -168,28 +202,39 @@ export const ToDoWrapper = () => {
             Get Things Done!
           </Text>
           <TodoForm addTodo={addTodo} />
-          {/* todoの数だけTodoコンポーネントを作成する */}
-          {/* isEditingの状態によって、TodoコンポーネントとEditTodoFormコンポーネント（編集・更新用）を切り替える */}
-          {todos.map((todo, index) =>
-            todo.isEditing ? (
-              <EditTodoForm
-                key={index}
-                id={todo.id}
-                task={todo.task}
-                editTask={editTask}
-              />
-            ) : (
-              <Todo
-                key={index}
-                id={todo.id}
-                task={todo.task}
-                completed={todo.completed}
-                toggleComplete={toggleComplete}
-                deleteTodo={deleteTodo}
-                editTodo={editTodo}
-              />
-            ),
-          )}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={todos}
+              strategy={verticalListSortingStrategy}
+            >
+              {/* todoの数だけTodoコンポーネントを作成する */}
+              {/* isEditingの状態によって、TodoコンポーネントとEditTodoFormコンポーネント（編集・更新用）を切り替える */}
+              {todos.map((todo, index) =>
+                todo.isEditing ? (
+                  <EditTodoForm
+                    key={index}
+                    id={todo.id}
+                    task={todo.task}
+                    editTask={editTask}
+                  />
+                ) : (
+                  <SortableTodo
+                    key={index}
+                    id={todo.id}
+                    task={todo.task}
+                    completed={todo.completed}
+                    toggleComplete={toggleComplete}
+                    deleteTodo={deleteTodo}
+                    editTodo={editTodo}
+                  />
+                ),
+              )}
+            </SortableContext>
+          </DndContext>
         </>
       ) : (
         <SignIn />
