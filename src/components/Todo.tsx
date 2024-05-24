@@ -1,5 +1,5 @@
 import { Text, Flex, IconButton } from '@chakra-ui/react';
-import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
+import { EditIcon, DeleteIcon, DragHandleIcon } from '@chakra-ui/icons';
 
 type TodoProps = {
   id: string;
@@ -28,13 +28,16 @@ export const Todo = ({
       borderRadius={8}
       mb="1rem"
     >
-      <Text
-        cursor="pointer"
-        onClick={() => toggleComplete(id)}
-        as={`${completed ? 's' : 'p'}`}
-      >
-        {task}
-      </Text>
+      <Flex alignItems="center">
+        <DragHandleIcon style={{ cursor: 'grab', marginRight: '8px' }} />
+        <Text
+          cursor="pointer"
+          onClick={() => toggleComplete(id)}
+          as={`${completed ? 's' : 'p'}`}
+        >
+          {task}
+        </Text>
+      </Flex>
       <Flex gap={3}>
         <IconButton
           size="xs"
