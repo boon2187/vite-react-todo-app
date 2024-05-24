@@ -1,5 +1,9 @@
 import { Text, Flex, IconButton } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon, DragHandleIcon } from '@chakra-ui/icons';
+import {
+  DraggableAttributes,
+  DraggableSyntheticListeners,
+} from '@dnd-kit/core';
 
 type TodoProps = {
   id: string;
@@ -11,7 +15,7 @@ type TodoProps = {
   dragHandleProps: any;
 };
 
-export const Todo = ({
+export const Todo: React.FC<TodoProps> = ({
   id,
   task,
   completed,
@@ -35,9 +39,11 @@ export const Todo = ({
           style={{ cursor: 'grab', marginRight: '8px' }}
           {...dragHandleProps}
         />
+
         <Text
           cursor="pointer"
           onClick={() => toggleComplete(id)}
+          onDragStart={() => toggleComplete(id)}
           as={`${completed ? 's' : 'p'}`}
         >
           {task}
@@ -52,6 +58,7 @@ export const Todo = ({
           color="#fff"
           icon={<EditIcon />}
           onClick={() => editTodo(id)}
+          zIndex={10}
         />
         <IconButton
           size="xs"
