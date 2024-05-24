@@ -8,6 +8,7 @@ type TodoProps = {
   toggleComplete: (id: string) => void;
   deleteTodo: (id: string) => void;
   editTodo: (id: string) => void;
+  dragHandleProps: any;
 };
 
 export const Todo = ({
@@ -17,6 +18,7 @@ export const Todo = ({
   toggleComplete,
   deleteTodo,
   editTodo,
+  dragHandleProps,
 }: TodoProps) => {
   return (
     <Flex
@@ -29,7 +31,10 @@ export const Todo = ({
       mb="1rem"
     >
       <Flex alignItems="center">
-        <DragHandleIcon style={{ cursor: 'grab', marginRight: '8px' }} />
+        <DragHandleIcon
+          style={{ cursor: 'grab', marginRight: '8px' }}
+          {...dragHandleProps}
+        />
         <Text
           cursor="pointer"
           onClick={() => toggleComplete(id)}

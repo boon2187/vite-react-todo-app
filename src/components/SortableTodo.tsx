@@ -43,6 +43,7 @@ export const SortableTodo = ({
         toggleComplete={toggleComplete}
         deleteTodo={deleteTodo}
         editTodo={editTodo}
+        dragHandleProps={{ ...listeners, ...attributes }}
       />
     </div>
   );
