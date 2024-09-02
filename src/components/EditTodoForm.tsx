@@ -16,6 +16,7 @@ export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // idがidのtodoに対して、formの内容(value)でtaskの内容を更新してformの内容を空にする
+    if (!value) return;
     editTask(id, value);
     setValue('');
     // console.log(value);
