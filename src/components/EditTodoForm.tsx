@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Button, FormControl, HStack, Input, Text } from '@chakra-ui/react';
 
 // propsの型を定義
@@ -11,6 +11,8 @@ type EditTodoFormProps = {
 export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
   // formの内容を保持するstate
   const [value, setValue] = useState<string>(task);
+  // formを参照するrefを作成
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // formのsubmit時の処理
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
