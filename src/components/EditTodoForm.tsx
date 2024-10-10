@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, FormControl, HStack, Input, Text } from '@chakra-ui/react';
 
 // propsの型を定義
@@ -11,12 +11,25 @@ type EditTodoFormProps = {
 export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
   // formの内容を保持するstate
   const [value, setValue] = useState<string>(task);
+  // formを参照するrefを作成
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // formが表示された時にinputにフォーカスする
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, []);
 
   // formのsubmit時の処理
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // idがidのtodoに対して、formの内容(value)でtaskの内容を更新してformの内容を空にする
-    if (!value) return;
+    if (!value) {
+      setValue(task);
+      return;
+    }
     editTask(id, value);
     setValue('');
     // console.log(value);
@@ -27,6 +40,7 @@ export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
       <FormControl mt="1rem" mb="2rem">
         <HStack>
           <Input
+            ref={inputRef}
             type="text"
             placeholder="What is the task today?"
             value={value}
