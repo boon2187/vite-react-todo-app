@@ -158,7 +158,7 @@ export const ToDoWrapper = () => {
       mx="auto"
       p={{ base: '2', md: '8' }}
       borderRadius={{ base: '0', md: '5' }}
-      w={{ base: '95vw', md: '80vs' }}
+      w={{ base: '95vw', md: '80vw' }}
       maxWidth="600px"
     >
       {user ? (
