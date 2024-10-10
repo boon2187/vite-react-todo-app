@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, FormControl, HStack, Input, Text } from '@chakra-ui/react';
 
 // propsの型を定義
@@ -13,6 +13,14 @@ export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
   const [value, setValue] = useState<string>(task);
   // formを参照するrefを作成
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // formが表示された時にinputにフォーカスする
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, []);
 
   // formのsubmit時の処理
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
