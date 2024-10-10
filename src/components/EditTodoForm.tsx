@@ -32,6 +32,7 @@ export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
       <FormControl mt="1rem" mb="2rem">
         <HStack>
           <Input
+            ref={inputRef}
             type="text"
             placeholder="What is the task today?"
             value={value}
