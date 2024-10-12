@@ -4,6 +4,12 @@ import {
   FormControl,
   HStack,
   Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
@@ -69,6 +75,20 @@ export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
           </HStack>
         </FormControl>
       </form>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Warning!</ModalHeader>
+          <ModalBody>
+            Empty tasks cannot be accepted. Please enter a task.
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={onClose}>
+              OK
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };
