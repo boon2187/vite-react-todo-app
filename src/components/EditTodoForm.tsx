@@ -1,5 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, FormControl, HStack, Input, Text } from '@chakra-ui/react';
+import {
+  Button,
+  FormControl,
+  HStack,
+  Input,
+  Text,
+  useDisclosure,
+} from '@chakra-ui/react';
 
 // propsの型を定義
 type EditTodoFormProps = {
@@ -11,6 +18,9 @@ type EditTodoFormProps = {
 export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
   // formの内容を保持するstate
   const [value, setValue] = useState<string>(task);
+  // Modal用のDisclosureを作成
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   // formを参照するrefを作成
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -26,7 +36,9 @@ export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // idがidのtodoに対して、formの内容(value)でtaskの内容を更新してformの内容を空にする
+    // その前にModalをオープンする
     if (!value) {
+      onOpen();
       setValue(task);
       return;
     }
@@ -36,25 +48,27 @@ export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <FormControl mt="1rem" mb="2rem">
-        <HStack>
-          <Input
-            ref={inputRef}
-            type="text"
-            placeholder="What is the task today?"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            bg="#E2E8F0"
-            h="45px"
-          />
-          <Button type="submit" bg="#8758ff" color="white" h="45px">
-            <Text px="12px" fontSize="sm">
-              Update Task
-            </Text>
-          </Button>
-        </HStack>
-      </FormControl>
-    </form>
+    <>
+      <form onSubmit={handleSubmit}>
+        <FormControl mt="1rem" mb="2rem">
+          <HStack>
+            <Input
+              ref={inputRef}
+              type="text"
+              placeholder="What is the task today?"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              bg="#E2E8F0"
+              h="45px"
+            />
+            <Button type="submit" bg="#8758ff" color="white" h="45px">
+              <Text px="12px" fontSize="sm">
+                Update Task
+              </Text>
+            </Button>
+          </HStack>
+        </FormControl>
+      </form>
+    </>
   );
 };
