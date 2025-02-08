@@ -9,7 +9,8 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write --loglevel=warn \"src/**/*.{js,jsx,ts,tsx,html,json,md}\"",
     "fix": "npm run --silent format; npm run --silent lint -- --fix",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "jest"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",
