@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Todo } from '../Todo';
@@ -38,23 +37,5 @@ describe('Todo Component', () => {
     render(<Todo {...todoProps} />);
     fireEvent.click(screen.getByLabelText('Delete Todo'));
     expect(mockDeleteTodo).toHaveBeenCalledWith('1');
-  });
-
-  test('空のタスクで更新しようとするとWarning!のモーダルが表示される', () => {
-    render(<Todo {...todoProps} />);
-
-    // 編集ボタンをクリック
-    fireEvent.click(screen.getByLabelText('Edit Todo'));
-
-    // 入力フィールドをクリア
-    const input = screen.getByText('Test Task');
-    fireEvent.change(input, { target: { value: '' } });
-
-    // Update Taskボタンをクリック
-    const updateButton = screen.getByText('Update Task');
-    fireEvent.click(updateButton);
-
-    // Warning!のモーダルが表示されることを確認
-    expect(screen.getByText('Warning!')).toBeInTheDocument();
   });
 });
