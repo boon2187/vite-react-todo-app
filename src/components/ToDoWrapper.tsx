@@ -29,6 +29,13 @@ import {
 
 uuidv4();
 
+// Firestore 操作失敗をコンソールに可視化するヘルパー
+// void でサイレント化していたのを catch 経由で出すことで、
+// ルール拒否・ネットワーク断などの原因究明を早める
+const logError = (operation: string) => (error: unknown) => {
+  console.error(`[${operation}] failed:`, error);
+};
+
 // todoの型を定義
 type Todotype = {
   id: string;
@@ -76,14 +83,17 @@ export const ToDoWrapper = () => {
 
     setTodos([...todos, newTodo]);
 
-    void db.collection('todos').doc(newTodo.id).set({
-      task: newTodo.task,
-      completed: newTodo.completed,
-      isEditing: newTodo.isEditing,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      uid: newTodo.uid,
-      order: newTodo.order,
-    });
+    db.collection('todos')
+      .doc(newTodo.id)
+      .set({
+        task: newTodo.task,
+        completed: newTodo.completed,
+        isEditing: newTodo.isEditing,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        uid: newTodo.uid,
+        order: newTodo.order,
+      })
+      .catch(logError('addTodo'));
   };
 
   const toggleComplete = (id: string) => {
@@ -92,26 +102,26 @@ export const ToDoWrapper = () => {
         todo.id === id ? { ...todo, completed: !todo.completed } : todo,
       ),
     );
-    void db
-      .collection('todos')
+    db.collection('todos')
       .doc(id)
       .update({
         completed: !todos.find((todo) => todo.id === id)?.completed,
-      });
+      })
+      .catch(logError('toggleComplete'));
   };
 
   const deleteTodo = (id: string) => {
     setTodos(todos.filter((todo) => todo.id !== id));
-    void db.collection('todos').doc(id).delete();
+    db.collection('todos').doc(id).delete().catch(logError('deleteTodo'));
   };
 
   const editTodo = (id: string) => {
-    void db
-      .collection('todos')
+    db.collection('todos')
       .doc(id)
       .update({
         isEditing: !todos.find((todo) => todo.id === id)?.isEditing,
-      });
+      })
+      .catch(logError('editTodo'));
 
     setTodos(
       todos.map((todo) =>
@@ -129,13 +139,13 @@ export const ToDoWrapper = () => {
       ),
     );
 
-    void db
-      .collection('todos')
+    db.collection('todos')
       .doc(id)
       .update({
         task: newTask,
         isEditing: !todos.find((todo) => todo.id === id)?.isEditing,
-      });
+      })
+      .catch(logError('editTask'));
   };
 
   // ドラッグ終了時: ローカル並び替え → Firestore に order を一括書き込み
@@ -158,7 +168,7 @@ export const ToDoWrapper = () => {
     reordered.forEach((t) => {
       batch.update(db.collection('todos').doc(t.id), { order: t.order });
     });
-    void batch.commit();
+    batch.commit().catch(logError('reorderTodos'));
   };
 
   useEffect(() => {
@@ -168,21 +178,27 @@ export const ToDoWrapper = () => {
       .where('uid', '==', `${auth.currentUser?.uid}`)
       .orderBy('order')
       .limit(30)
-      .onSnapshot((snapshot) => {
-        setTodos(
-          snapshot.docs.map((doc) => {
-            const data = doc.data() as Omit<Todotype, 'id'>;
-            return {
-              id: doc.id,
-              task: data.task,
-              completed: data.completed,
-              isEditing: data.isEditing,
-              uid: data.uid,
-              order: data.order,
-            };
-          }),
-        );
-      });
+      .onSnapshot(
+        (snapshot) => {
+          setTodos(
+            snapshot.docs.map((doc) => {
+              const data = doc.data() as Omit<Todotype, 'id'>;
+              return {
+                id: doc.id,
+                task: data.task,
+                completed: data.completed,
+                isEditing: data.isEditing,
+                uid: data.uid,
+                order: data.order,
+              };
+            }),
+          );
+        },
+        (error) => {
+          // インデックス不足・ルール拒否・認証切れなどが無言で起きないようにする
+          console.error('[onSnapshot] subscription error:', error);
+        },
+      );
     console.log(auth.currentUser?.uid);
     return () => unsubscribe();
   }, [user]);

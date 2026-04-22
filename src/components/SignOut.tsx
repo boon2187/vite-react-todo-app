@@ -18,7 +18,9 @@ export const SignOut = () => {
         colorPalette="purple"
         aria-label="Sign Out"
         onClick={() => {
-          void auth.signOut();
+          auth.signOut().catch((error: unknown) => {
+            console.error('[signOut] failed:', error);
+          });
         }}
       >
         <FontAwesomeIcon icon={faUnlock} />
