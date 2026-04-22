@@ -10,6 +10,22 @@ import { auth, db } from '../firebase.ts';
 import { SignIn } from './SignIn';
 import { SignOut } from './SignOut';
 import firebase from 'firebase/compat/app';
+import {
+  DndContext,
+  type DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 
 uuidv4();
 
@@ -20,6 +36,7 @@ type Todotype = {
   completed: boolean;
   isEditing: boolean;
   uid: string;
+  order: number;
 };
 
 export const ToDoWrapper = () => {
@@ -30,40 +47,51 @@ export const ToDoWrapper = () => {
   // firebase/compat の auth と modular の Auth 型が合わないため二段キャストで解消
   const [user] = useAuthState(auth as unknown as Auth);
 
+  // ドラッグ入力: マウス/タッチ/キーボードに対応
+  // Pointer は 5px 動かさないと発火させないことでクリックと区別
+  // Touch は 150ms の長押しでドラッグ開始にしてスクロールと区別
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 150, tolerance: 5 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
   // todoを追加する関数
   const addTodo = (todo: string) => {
-    // 新しいtodoを作成する
+    // 新しいtodoは末尾に配置
+    const maxOrder = todos.length > 0 ? Math.max(...todos.map((t) => t.order)) : -1;
+
     const newTodo = {
       id: uuidv4(),
       task: todo,
       completed: false,
       isEditing: false,
       uid: auth.currentUser?.uid as string,
+      order: maxOrder + 1,
     };
 
-    // 新しいtodoをtodosステートに追加する
     setTodos([...todos, newTodo]);
 
-    // firestoreにnewTodoをドキュメントidをidとして追加する
     void db.collection('todos').doc(newTodo.id).set({
       task: newTodo.task,
       completed: newTodo.completed,
       isEditing: newTodo.isEditing,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       uid: newTodo.uid,
+      order: newTodo.order,
     });
   };
 
-  // todoの完了状態を変更する関数
-  // todoコンポーネントに渡す
   const toggleComplete = (id: string) => {
-    // ボタンを押したtodoのidと一致するtodoのcompletedを反転させる
     setTodos(
       todos.map((todo) =>
         todo.id === id ? { ...todo, completed: !todo.completed } : todo,
       ),
     );
-    // firestoreの該当のtodoのcompletedを反転させる
     void db
       .collection('todos')
       .doc(id)
@@ -72,22 +100,12 @@ export const ToDoWrapper = () => {
       });
   };
 
-  // todoを削除する関数
-  // todoコンポーネントに渡す
   const deleteTodo = (id: string) => {
-    // 削除の手順は調べる必要あり
-    // ローカルのtodosを削除して、Firestoreからも削除するがいいのかな…と思う
     setTodos(todos.filter((todo) => todo.id !== id));
-
-    // 該当のtodoをfirestoreからも削除する
     void db.collection('todos').doc(id).delete();
   };
 
-  // todoの編集を開始する関数
-  // 開始する関数なので、isEditingを反転させるだけ
-  // todoコンポーネントに渡す
   const editTodo = (id: string) => {
-    // firestoreの該当のtodoのisEditingを反転させる
     void db
       .collection('todos')
       .doc(id)
@@ -95,30 +113,22 @@ export const ToDoWrapper = () => {
         isEditing: !todos.find((todo) => todo.id === id)?.isEditing,
       });
 
-    // ボタンを押したtodoのidと一致するtodoのisEditingを反転させる
     setTodos(
-      // ローカルのtodosを更新する
       todos.map((todo) =>
         todo.id === id ? { ...todo, isEditing: !todo.isEditing } : todo,
       ),
     );
   };
 
-  // todoを実際に更新する関数
-  // 編集開始されたtodoのidと、新しいtodoを受け取ってtodoの中身を更新する
-  // isEditingを反転させて戻す
-  // editTodoFormコンポーネントに渡す
   const editTask = (id: string, newTask: string) => {
     setTodos(
       todos.map((todo) =>
-        // 編集するidと一致するtodoのtaskを新しいtaskに更新する
         todo.id === id
           ? { ...todo, task: newTask, isEditing: !todo.isEditing }
           : todo,
       ),
     );
 
-    // firestoreの該当のtodoのtaskを更新する
     void db
       .collection('todos')
       .doc(id)
@@ -128,13 +138,35 @@ export const ToDoWrapper = () => {
       });
   };
 
-  // useEffectを使って、ログイン時にFirestoreからtodoを取得する
+  // ドラッグ終了時: ローカル並び替え → Firestore に order を一括書き込み
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = todos.findIndex((t) => t.id === active.id);
+    const newIndex = todos.findIndex((t) => t.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reordered = arrayMove(todos, oldIndex, newIndex).map((t, i) => ({
+      ...t,
+      order: i,
+    }));
+    setTodos(reordered);
+
+    // 全ドキュメントの order を書き直す(最大30件なので writeBatch で1往復)
+    const batch = db.batch();
+    reordered.forEach((t) => {
+      batch.update(db.collection('todos').doc(t.id), { order: t.order });
+    });
+    void batch.commit();
+  };
+
   useEffect(() => {
     // onSnapshot は unsubscribe 関数を返す(Promise ではない)ので await しない
     const unsubscribe = db
       .collection('todos')
       .where('uid', '==', `${auth.currentUser?.uid}`)
-      .orderBy('createdAt')
+      .orderBy('order')
       .limit(30)
       .onSnapshot((snapshot) => {
         setTodos(
@@ -146,11 +178,11 @@ export const ToDoWrapper = () => {
               completed: data.completed,
               isEditing: data.isEditing,
               uid: data.uid,
+              order: data.order,
             };
           }),
         );
       });
-    // ログインしているユーザーのtodoのみ取得する
     console.log(auth.currentUser?.uid);
     return () => unsubscribe();
   }, [user]);
@@ -172,28 +204,37 @@ export const ToDoWrapper = () => {
             Get Things Done!
           </Text>
           <TodoForm addTodo={addTodo} />
-          {/* todoの数だけTodoコンポーネントを作成する */}
-          {/* isEditingの状態によって、TodoコンポーネントとEditTodoFormコンポーネント(編集・更新用)を切り替える */}
-          {todos.map((todo, index) =>
-            todo.isEditing ? (
-              <EditTodoForm
-                key={index}
-                id={todo.id}
-                task={todo.task}
-                editTask={editTask}
-              />
-            ) : (
-              <Todo
-                key={index}
-                id={todo.id}
-                task={todo.task}
-                completed={todo.completed}
-                toggleComplete={toggleComplete}
-                deleteTodo={deleteTodo}
-                editTodo={editTodo}
-              />
-            ),
-          )}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={todos.map((t) => t.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {todos.map((todo) =>
+                todo.isEditing ? (
+                  <EditTodoForm
+                    key={todo.id}
+                    id={todo.id}
+                    task={todo.task}
+                    editTask={editTask}
+                  />
+                ) : (
+                  <Todo
+                    key={todo.id}
+                    id={todo.id}
+                    task={todo.task}
+                    completed={todo.completed}
+                    toggleComplete={toggleComplete}
+                    deleteTodo={deleteTodo}
+                    editTodo={editTodo}
+                  />
+                ),
+              )}
+            </SortableContext>
+          </DndContext>
         </>
       ) : (
         <SignIn />
