@@ -5,6 +5,7 @@ import { Todo } from './Todo';
 import { EditTodoForm } from './EditTodoForm';
 import { Box, Text } from '@chakra-ui/react';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import type { Auth } from 'firebase/auth';
 import { auth, db } from '../firebase.ts';
 import { SignIn } from './SignIn';
 import { SignOut } from './SignOut';
@@ -26,8 +27,8 @@ export const ToDoWrapper = () => {
   const [todos, setTodos] = useState<Todotype[]>([]);
 
   // ログインしているユーザーの情報を取得
-  const [user] = useAuthState(auth as any);
-  // const user = auth.currentUser;
+  // firebase/compat の auth と modular の Auth 型が合わないため二段キャストで解消
+  const [user] = useAuthState(auth as unknown as Auth);
 
   // todoを追加する関数
   const addTodo = (todo: string) => {
@@ -44,19 +45,18 @@ export const ToDoWrapper = () => {
     setTodos([...todos, newTodo]);
 
     // firestoreにnewTodoをドキュメントidをidとして追加する
-    db.collection('todos').doc(newTodo.id).set({
+    void db.collection('todos').doc(newTodo.id).set({
       task: newTodo.task,
       completed: newTodo.completed,
       isEditing: newTodo.isEditing,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       uid: newTodo.uid,
     });
-    // console.log(todos);
   };
 
   // todoの完了状態を変更する関数
   // todoコンポーネントに渡す
-  const toggleComplete = async (id: string) => {
+  const toggleComplete = (id: string) => {
     // ボタンを押したtodoのidと一致するtodoのcompletedを反転させる
     setTodos(
       todos.map((todo) =>
@@ -64,7 +64,7 @@ export const ToDoWrapper = () => {
       ),
     );
     // firestoreの該当のtodoのcompletedを反転させる
-    await db
+    void db
       .collection('todos')
       .doc(id)
       .update({
@@ -80,15 +80,15 @@ export const ToDoWrapper = () => {
     setTodos(todos.filter((todo) => todo.id !== id));
 
     // 該当のtodoをfirestoreからも削除する
-    db.collection('todos').doc(id).delete();
+    void db.collection('todos').doc(id).delete();
   };
 
   // todoの編集を開始する関数
   // 開始する関数なので、isEditingを反転させるだけ
   // todoコンポーネントに渡す
-  const editTodo = async (id: string) => {
+  const editTodo = (id: string) => {
     // firestoreの該当のtodoのisEditingを反転させる
-    await db
+    void db
       .collection('todos')
       .doc(id)
       .update({
@@ -119,7 +119,8 @@ export const ToDoWrapper = () => {
     );
 
     // firestoreの該当のtodoのtaskを更新する
-    db.collection('todos')
+    void db
+      .collection('todos')
       .doc(id)
       .update({
         task: newTask,
@@ -129,26 +130,29 @@ export const ToDoWrapper = () => {
 
   // useEffectを使って、ログイン時にFirestoreからtodoを取得する
   useEffect(() => {
-    (async () => {
-      await db
-        .collection('todos')
-        .where('uid', '==', `${auth.currentUser?.uid}`)
-        .orderBy('createdAt')
-        .limit(30)
-        .onSnapshot((snapshot) => {
-          setTodos(
-            snapshot.docs.map((doc) => ({
+    // onSnapshot は unsubscribe 関数を返す(Promise ではない)ので await しない
+    const unsubscribe = db
+      .collection('todos')
+      .where('uid', '==', `${auth.currentUser?.uid}`)
+      .orderBy('createdAt')
+      .limit(30)
+      .onSnapshot((snapshot) => {
+        setTodos(
+          snapshot.docs.map((doc) => {
+            const data = doc.data() as Omit<Todotype, 'id'>;
+            return {
               id: doc.id,
-              task: doc.data().task,
-              completed: doc.data().completed,
-              isEditing: doc.data().isEditing,
-              uid: doc.data().uid,
-            })),
-          );
-        });
-    })();
+              task: data.task,
+              completed: data.completed,
+              isEditing: data.isEditing,
+              uid: data.uid,
+            };
+          }),
+        );
+      });
     // ログインしているユーザーのtodoのみ取得する
     console.log(auth.currentUser?.uid);
+    return () => unsubscribe();
   }, [user]);
 
   return (
@@ -169,7 +173,7 @@ export const ToDoWrapper = () => {
           </Text>
           <TodoForm addTodo={addTodo} />
           {/* todoの数だけTodoコンポーネントを作成する */}
-          {/* isEditingの状態によって、TodoコンポーネントとEditTodoFormコンポーネント（編集・更新用）を切り替える */}
+          {/* isEditingの状態によって、TodoコンポーネントとEditTodoFormコンポーネント(編集・更新用)を切り替える */}
           {todos.map((todo, index) =>
             todo.isEditing ? (
               <EditTodoForm

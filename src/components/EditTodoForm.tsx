@@ -1,15 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  Box,
   Button,
-  FormControl,
+  Dialog,
   HStack,
   Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
+  Portal,
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
@@ -25,7 +21,7 @@ export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
   // formの内容を保持するstate
   const [value, setValue] = useState<string>(task);
   // Modal用のDisclosureを作成
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { open, onOpen, onClose } = useDisclosure();
 
   // formを参照するrefを作成
   const inputRef = useRef<HTMLInputElement>(null);
@@ -50,13 +46,12 @@ export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
     }
     editTask(id, value);
     setValue('');
-    // console.log(value);
   };
 
   return (
     <>
       <form onSubmit={handleSubmit}>
-        <FormControl mt="1rem" mb="2rem">
+        <Box mt="1rem" mb="2rem">
           <HStack>
             <Input
               ref={inputRef}
@@ -73,22 +68,33 @@ export const EditTodoForm = ({ id, task, editTask }: EditTodoFormProps) => {
               </Text>
             </Button>
           </HStack>
-        </FormControl>
+        </Box>
       </form>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Warning!</ModalHeader>
-          <ModalBody>
-            Empty tasks cannot be accepted. Please enter a task.
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
-              OK
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <Dialog.Root
+        open={open}
+        onOpenChange={(e) => {
+          if (!e.open) onClose();
+        }}
+      >
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Header>
+                <Dialog.Title>Warning!</Dialog.Title>
+              </Dialog.Header>
+              <Dialog.Body>
+                Empty tasks cannot be accepted. Please enter a task.
+              </Dialog.Body>
+              <Dialog.Footer>
+                <Button colorPalette="blue" mr={3} onClick={onClose}>
+                  OK
+                </Button>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
     </>
   );
 };
