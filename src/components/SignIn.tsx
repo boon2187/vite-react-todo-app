@@ -6,8 +6,12 @@ import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 export const SignIn = () => {
   async function signInWithGoogle() {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error('[signIn] failed:', error);
+    }
   }
   return (
     <Flex>
