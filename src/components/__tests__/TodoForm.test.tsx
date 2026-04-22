@@ -1,11 +1,12 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { TodoForm } from '../TodoForm';
+import { renderWithProvider } from './testUtils';
 
 describe('TodoForm Component', () => {
   test('renders input and submit button', () => {
-    render(<TodoForm addTodo={jest.fn()} />);
+    renderWithProvider(<TodoForm addTodo={jest.fn()} />);
     expect(
       screen.getByPlaceholderText('What is the task today?'),
     ).toBeInTheDocument();
@@ -17,7 +18,7 @@ describe('TodoForm Component', () => {
   test('calls addTodo with entered value on submit', async () => {
     const user = userEvent.setup();
     const mockAddTodo = jest.fn();
-    render(<TodoForm addTodo={mockAddTodo} />);
+    renderWithProvider(<TodoForm addTodo={mockAddTodo} />);
 
     await user.type(
       screen.getByPlaceholderText('What is the task today?'),
@@ -31,7 +32,7 @@ describe('TodoForm Component', () => {
   test('does not call addTodo when submitting empty input', async () => {
     const user = userEvent.setup();
     const mockAddTodo = jest.fn();
-    render(<TodoForm addTodo={mockAddTodo} />);
+    renderWithProvider(<TodoForm addTodo={mockAddTodo} />);
 
     await user.click(screen.getByRole('button', { name: 'Add Task' }));
 
@@ -40,7 +41,7 @@ describe('TodoForm Component', () => {
 
   test('clears input after successful submit', async () => {
     const user = userEvent.setup();
-    render(<TodoForm addTodo={jest.fn()} />);
+    renderWithProvider(<TodoForm addTodo={jest.fn()} />);
 
     const input = screen.getByPlaceholderText(
       'What is the task today?',

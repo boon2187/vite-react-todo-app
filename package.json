@@ -60,6 +60,12 @@
     "transform": {
       "^.+\\.(js|jsx|ts|tsx)$": "babel-jest"
     },
-    "testEnvironment": "jsdom"
+    "testEnvironment": "jsdom",
+    "testMatch": [
+      "<rootDir>/src/**/*.test.(ts|tsx)"
+    ],
+    "setupFiles": [
+      "<rootDir>/jest.setup.js"
+    ]
   }
 }

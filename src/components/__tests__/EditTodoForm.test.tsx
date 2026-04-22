@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { EditTodoForm } from '../EditTodoForm';
+import { renderWithProvider } from './testUtils';
 
 describe('EditTodoForm Component', () => {
   const defaultProps = {
@@ -15,14 +16,16 @@ describe('EditTodoForm Component', () => {
   });
 
   test('renders input prefilled with the current task', () => {
-    render(<EditTodoForm {...defaultProps} />);
+    renderWithProvider(<EditTodoForm {...defaultProps} />);
     expect(screen.getByDisplayValue('Original task')).toBeInTheDocument();
   });
 
   test('calls editTask with id and new value on submit', async () => {
     const user = userEvent.setup();
     const mockEditTask = jest.fn();
-    render(<EditTodoForm {...defaultProps} editTask={mockEditTask} />);
+    renderWithProvider(
+      <EditTodoForm {...defaultProps} editTask={mockEditTask} />,
+    );
 
     const input = screen.getByDisplayValue('Original task');
     await user.clear(input);
@@ -35,7 +38,9 @@ describe('EditTodoForm Component', () => {
   test('opens warning modal and does not call editTask when submitting empty input', async () => {
     const user = userEvent.setup();
     const mockEditTask = jest.fn();
-    render(<EditTodoForm {...defaultProps} editTask={mockEditTask} />);
+    renderWithProvider(
+      <EditTodoForm {...defaultProps} editTask={mockEditTask} />,
+    );
 
     const input = screen.getByDisplayValue('Original task');
     await user.clear(input);
@@ -47,7 +52,7 @@ describe('EditTodoForm Component', () => {
 
   test('closes warning modal when OK button is clicked', async () => {
     const user = userEvent.setup();
-    render(<EditTodoForm {...defaultProps} />);
+    renderWithProvider(<EditTodoForm {...defaultProps} />);
 
     const input = screen.getByDisplayValue('Original task');
     await user.clear(input);
