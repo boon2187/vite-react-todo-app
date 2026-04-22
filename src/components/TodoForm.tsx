@@ -1,4 +1,4 @@
-import { Button, FormControl, HStack, Input } from '@chakra-ui/react';
+import { Box, Button, HStack, Input } from '@chakra-ui/react';
 import React, { useState } from 'react';
 
 // propsの型を定義
@@ -22,7 +22,7 @@ export const TodoForm = ({ addTodo }: TodoFormProps) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <FormControl mt="1rem" mb="1.5rem">
+      <Box mt="1rem" mb="1.5rem">
         <HStack>
           <Input
             type="text"
@@ -32,11 +32,11 @@ export const TodoForm = ({ addTodo }: TodoFormProps) => {
             bg="whiteAlpha.800"
             h="45px"
           />
-          <Button type="submit" colorScheme="purple" color="white" h="45px">
+          <Button type="submit" colorPalette="purple" color="white" h="45px">
             Add Task
           </Button>
         </HStack>
-      </FormControl>
+      </Box>
     </form>
   );
 };

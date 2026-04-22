@@ -1,6 +1,7 @@
 import { auth } from '../firebase.ts';
-import { Avatar, IconButton, Flex, Text } from '@chakra-ui/react';
-import { UnlockIcon } from '@chakra-ui/icons';
+import { Avatar, Flex, IconButton, Text } from '@chakra-ui/react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUnlock } from '@fortawesome/free-solid-svg-icons';
 
 export const SignOut = () => {
   return (
@@ -14,21 +15,19 @@ export const SignOut = () => {
       mb="30px"
     >
       <IconButton
-        colorScheme="purple"
+        colorPalette="purple"
         aria-label="Sign Out"
-        icon={<UnlockIcon />}
         onClick={() => auth.signOut()}
       >
-        サインアウト
+        <FontAwesomeIcon icon={faUnlock} />
       </IconButton>
       <Text fontSize="xl" fontWeight="bold">
         {auth.currentUser?.displayName}
       </Text>
-      <Avatar
-        size="sm"
-        name="login user name"
-        src={`${auth.currentUser?.photoURL}`}
-      />
+      <Avatar.Root size="sm">
+        <Avatar.Fallback name="login user name" />
+        <Avatar.Image src={`${auth.currentUser?.photoURL}`} />
+      </Avatar.Root>
     </Flex>
   );
 };

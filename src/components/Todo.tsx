@@ -1,5 +1,6 @@
-import { Text, Flex, IconButton } from '@chakra-ui/react';
-import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
+import { Flex, IconButton, Text } from '@chakra-ui/react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPen, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 
 type TodoProps = {
   id: string;
@@ -31,7 +32,7 @@ export const Todo = ({
       <Text
         cursor="pointer"
         onClick={() => toggleComplete(id)}
-        as={`${completed ? 's' : 'p'}`}
+        textDecoration={completed ? 'line-through' : 'none'}
       >
         {task}
       </Text>
@@ -42,9 +43,10 @@ export const Todo = ({
           aria-label="Edit Todo"
           bg="#8758ff"
           color="#fff"
-          icon={<EditIcon />}
           onClick={() => editTodo(id)}
-        />
+        >
+          <FontAwesomeIcon icon={faPen} />
+        </IconButton>
         <IconButton
           size="xs"
           fontSize="18px"
@@ -52,8 +54,9 @@ export const Todo = ({
           bg="#8758ff"
           color="#fff"
           onClick={() => deleteTodo(id)}
-          icon={<DeleteIcon />}
-        />
+        >
+          <FontAwesomeIcon icon={faTrashCan} />
+        </IconButton>
       </Flex>
     </Flex>
   );
