@@ -43,9 +43,9 @@ describe('TodoForm Component', () => {
     const user = userEvent.setup();
     renderWithProvider(<TodoForm addTodo={jest.fn()} />);
 
-    const input = screen.getByPlaceholderText(
+    const input = screen.getByPlaceholderText<HTMLInputElement>(
       'What is the task today?',
-    ) as HTMLInputElement;
+    );
     await user.type(input, 'Buy milk');
     await user.click(screen.getByRole('button', { name: 'Add Task' }));
 

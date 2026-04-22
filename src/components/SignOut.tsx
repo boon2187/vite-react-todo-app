@@ -17,7 +17,9 @@ export const SignOut = () => {
       <IconButton
         colorPalette="purple"
         aria-label="Sign Out"
-        onClick={() => auth.signOut()}
+        onClick={() => {
+          void auth.signOut();
+        }}
       >
         <FontAwesomeIcon icon={faUnlock} />
       </IconButton>

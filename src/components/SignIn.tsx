@@ -11,7 +11,7 @@ export const SignIn = () => {
   }
   return (
     <Flex>
-      <Button mx="auto" colorPalette="teal" onClick={signInWithGoogle}>
+      <Button mx="auto" colorPalette="teal" onClick={() => void signInWithGoogle()}>
         Googleのアカウントでログイン
         <FontAwesomeIcon icon={faArrowRight} style={{ marginLeft: '10px' }} />
       </Button>
