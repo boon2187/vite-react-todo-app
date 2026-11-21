@@ -72,7 +72,8 @@
       "<rootDir>/jest.setup.js"
     ]
   },
-    "overrides": {
-    "js-yaml": "^4.1.0"
+  "overrides": {
+    "js-yaml": "^4.1.0",
+    "@grpc/grpc-js": "1.14.7"
   }
 }
